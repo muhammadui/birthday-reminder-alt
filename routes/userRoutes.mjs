@@ -1,4 +1,5 @@
 import express from "express";
+import User from "../models/User.mjs";
 import methodOverride from "method-override";
 import {
   addUser,

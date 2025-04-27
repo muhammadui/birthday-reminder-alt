@@ -38,6 +38,7 @@ export const getUsers = async (req, res) => {
     });
   } catch (error) {
     req.flash("error", error.message);
+    console.log(error);
     res.redirect("/");
   }
 };
