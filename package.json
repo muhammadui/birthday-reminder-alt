@@ -2,10 +2,10 @@
   "name": "birthday-reminder",
   "version": "1.0.0",
   "description": "An application to send birthday reminders to customers",
-  "main": "server.mjs",
+  "main": "index.mjs",
   "type": "module",
   "scripts": {
-    "start": "node server.mjs",
+    "start": "node index.mjs",
     "dev2": "nodemon index.mjs",
     "dev": "nodemon server.mjs"
   },
