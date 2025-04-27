@@ -7,6 +7,7 @@ import ejsLayouts from "express-ejs-layouts";
 import flash from "connect-flash";
 import session from "express-session";
 import routes from "./routes/userRoutes.mjs";
+import { initCronJobs } from "./utils/cronJobs.mjs";
 
 // Load environment variables
 dotenv.config();
@@ -74,6 +75,8 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  initCronJobs();
+  console.log("Cron jobs initialized");
 });
 
 export default app;
