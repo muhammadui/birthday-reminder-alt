@@ -6,7 +6,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Default sender email
 const DEFAULT_FROM =
-  process.env.DEFAULT_FROM_EMAIL || "birthday@yourdomain.com";
+  process.env.DEFAULT_FROM_EMAIL || "birthdays@traknex.com.ng";
 
 /**
  * Send a birthday email to a user
