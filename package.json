@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
+    "dev2": "nodemon index.mjs",
     "dev": "nodemon server.mjs"
   },
   "keywords": [
@@ -19,9 +20,14 @@
   "license": "ISC",
   "packageManager": "pnpm@10.8.0+sha512.0e82714d1b5b43c74610193cb20734897c1d00de89d0e18420aebc5977fa13d780a9cb05734624e81ebd81cc876cd464794850641c48b9544326b5622ca29971",
   "dependencies": {
+    "connect-flash": "^0.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
+    "ejs": "^3.1.10",
     "express": "^5.1.0",
+    "express-ejs-layouts": "^2.5.1",
+    "express-session": "^1.18.1",
+    "method-override": "^3.0.0",
     "mongoose": "^8.13.2",
     "node-cron": "^3.0.3",
     "resend": "^4.3.0"

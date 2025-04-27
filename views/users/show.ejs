@@ -1,0 +1,31 @@
+<div>
+    <div class="flex justify-between items-start mb-6">
+        <h1 class="text-2xl font-bold">User Details</h1>
+        <div class="flex space-x-2">
+            <a href="/users" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Back to Users</a>
+            <a href="/users/<%= user._id %>/edit" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Edit</a>
+            <a href="/emails/send/<%= user._id %>" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Send Birthday Email</a>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <p class="text-gray-600">Username</p>
+                <p class="text-lg font-semibold"><%= user.username %></p>
+            </div>
+            <div>
+                <p class="text-gray-600">Email</p>
+                <p class="text-lg font-semibold"><%= user.email %></p>
+            </div>
+            <div>
+                <p class="text-gray-600">Date of Birth</p>
+                <p class="text-lg font-semibold"><%= new Date(user.dateOfBirth).toLocaleDateString() %></p>
+            </div>
+            <div>
+                <p class="text-gray-600">Created At</p>
+                <p class="text-lg font-semibold"><%= new Date(user.createdAt).toLocaleString() %></p>
+            </div>
+        </div>
+    </div>
+</div>

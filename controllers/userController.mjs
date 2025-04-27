@@ -1,4 +1,5 @@
 import User from "../models/User.mjs";
+import { sendBirthdayEmail } from "../services/emailService.mjs";
 
 // Add a new user with birthday info
 export const addUser = async (req, res) => {
@@ -8,10 +9,8 @@ export const addUser = async (req, res) => {
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        message: "User with this email already exists",
-      });
+      req.flash("error", "User with this email already exists");
+      return res.redirect("/users/new");
     }
 
     // Create new user
@@ -21,34 +20,31 @@ export const addUser = async (req, res) => {
       dateOfBirth,
     });
 
-    res.status(201).json({
-      success: true,
-      data: user,
-    });
+    req.flash("success", `User ${username} added successfully!`);
+    res.redirect("/users");
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    req.flash("error", error.message);
+    res.redirect("/users/new");
   }
 };
 
 // Get all users
 export const getUsers = async (req, res) => {
   try {
-    const users = await User.find();
-
-    res.status(200).json({
-      success: true,
-      count: users.length,
-      data: users,
+    const users = await User.find().sort({ username: 1 });
+    res.render("users/index", {
+      users,
+      title: "All Users",
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    req.flash("error", error.message);
+    res.redirect("/");
   }
+};
+
+// Form to create a new user
+export const newUserForm = async (req, res) => {
+  res.render("users/new", { title: "Add User" });
 };
 
 // Get a single user
@@ -57,21 +53,37 @@ export const getUser = async (req, res) => {
     const user = await User.findById(req.params.id);
 
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
+      req.flash("error", "User not found");
+      return res.redirect("/users");
     }
 
-    res.status(200).json({
-      success: true,
-      data: user,
+    res.render("users/show", {
+      user,
+      title: user.username,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
+    req.flash("error", error.message);
+    res.redirect("/users");
+  }
+};
+
+// Show form to edit user
+export const editUserForm = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      req.flash("error", "User not found");
+      return res.redirect("/users");
+    }
+
+    res.render("users/edit", {
+      user,
+      title: `Edit ${user.username}`,
     });
+  } catch (error) {
+    req.flash("error", error.message);
+    res.redirect("/users");
   }
 };
 
@@ -84,21 +96,15 @@ export const updateUser = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
+      req.flash("error", "User not found");
+      return res.redirect("/users");
     }
 
-    res.status(200).json({
-      success: true,
-      data: user,
-    });
+    req.flash("success", `User ${user.username} updated successfully!`);
+    res.redirect(`/users/${user._id}`);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    req.flash("error", error.message);
+    res.redirect(`/users/${req.params.id}/edit`);
   }
 };
 
@@ -108,21 +114,15 @@ export const deleteUser = async (req, res) => {
     const user = await User.findByIdAndDelete(req.params.id);
 
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
+      req.flash("error", "User not found");
+      return res.redirect("/users");
     }
 
-    res.status(200).json({
-      success: true,
-      data: {},
-    });
+    req.flash("success", `User ${user.username} deleted successfully!`);
+    res.redirect("/users");
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    req.flash("error", error.message);
+    res.redirect("/users");
   }
 };
 
@@ -141,22 +141,17 @@ export const getTodaysBirthdays = async (req, res) => {
           { $eq: [{ $dayOfMonth: "$dateOfBirth" }, day] },
         ],
       },
-    });
+    }).sort({ username: 1 });
 
-    res.status(200).json({
-      success: true,
-      count: users.length,
-      data: users,
+    res.render("birthdays/index", {
+      users,
+      title: "Today's Birthdays",
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    req.flash("error", error.message);
+    res.redirect("/");
   }
 };
-
-//
 
 // Test endpoint to manually trigger birthday emails
 export const testBirthdayEmail = async (req, res) => {
@@ -172,9 +167,6 @@ export const testBirthdayEmail = async (req, res) => {
         message: "User not found",
       });
     }
-
-    // Import the email service
-    const { sendBirthdayEmail } = await import("../services/emailService.mjs");
 
     // Send test birthday email
     const emailResult = await sendBirthdayEmail(user);
@@ -197,9 +189,6 @@ export const simulateTodaysBirthdays = async (req, res) => {
   try {
     // Get users regardless of birthday date
     const users = await User.find().limit(5); // Limit to 5 users for safety
-
-    // Import the email service
-    const { sendBirthdayEmail } = await import("../services/emailService.mjs");
 
     // Send emails to selected users
     const results = [];
@@ -296,13 +285,7 @@ export const triggerBirthdayCheck = async () => {
   }
 };
 
-// Add this to routes/userRoutes.mjs
-
-// Add the following to the .env file
-/*
-PORT=5000
-MONGO_URI=mongodb://localhost:27017/birthday-reminder
-RESEND_API_KEY=your_resend_api_key
-EMAIL_FROM=birthday@yourbusiness.com
-
-*/
+// Render the homepage
+export const renderHomePage = async (req, res) => {
+  res.render("index", { title: "Home" });
+};
